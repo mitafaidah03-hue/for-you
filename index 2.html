@@ -1,0 +1,737 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Selamat Ulang Tahun</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --cream:#FAF7F2;
+    --beige:#EADBC8;
+    --taupe:#BCA37F;
+    --text-dark:#5c4d3c;
+    --text-soft:#8a7860;
+    --shadow: 0 10px 30px rgba(188,163,127,0.25);
+  }
+
+  *{margin:0;padding:0;box-sizing:border-box;}
+
+  html{scroll-behavior:smooth;}
+
+  body{
+    font-family:'Poppins', sans-serif;
+    background: linear-gradient(160deg, var(--cream) 0%, var(--beige) 100%);
+    color: var(--text-dark);
+    min-height:100vh;
+    overflow-x:hidden;
+    position:relative;
+  }
+
+  h1,h2,.serif{
+    font-family:'Playfair Display', serif;
+  }
+
+  /* ---------- Loading Screen ---------- */
+  #loading-screen{
+    position:fixed;inset:0;
+    background: var(--cream);
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    z-index:9999;
+    transition: opacity 1s ease, visibility 1s ease;
+  }
+  #loading-screen.hidden{
+    opacity:0;
+    visibility:hidden;
+    pointer-events:none;
+  }
+  .loader-heart{
+    font-size:2.2rem;
+    color:var(--taupe);
+    animation: pulse 1.2s ease-in-out infinite;
+  }
+  .loader-text{
+    margin-top:14px;
+    font-size:0.85rem;
+    letter-spacing:2px;
+    text-transform:uppercase;
+    color:var(--text-soft);
+  }
+  @keyframes pulse{
+    0%,100%{transform:scale(1);opacity:0.7;}
+    50%{transform:scale(1.25);opacity:1;}
+  }
+
+  /* ---------- Particle Background ---------- */
+  #particles{
+    position:fixed;
+    inset:0;
+    z-index:0;
+    pointer-events:none;
+    overflow:hidden;
+  }
+  .particle{
+    position:absolute;
+    bottom:-10px;
+    background: radial-gradient(circle, rgba(188,163,127,0.5) 0%, rgba(188,163,127,0) 70%);
+    border-radius:50%;
+    animation: floatUp linear infinite;
+  }
+  @keyframes floatUp{
+    0%{ transform: translateY(0) translateX(0); opacity:0; }
+    10%{ opacity:0.8; }
+    90%{ opacity:0.6; }
+    100%{ transform: translateY(-110vh) translateX(20px); opacity:0; }
+  }
+
+  /* ---------- Floating Hearts ---------- */
+  #hearts-container{
+    position:fixed;
+    inset:0;
+    z-index:1;
+    pointer-events:none;
+    overflow:hidden;
+  }
+  .heart{
+    position:absolute;
+    bottom:-40px;
+    color: var(--taupe);
+    opacity:0.55;
+    animation: heartFloat linear infinite;
+    font-size:1.4rem;
+  }
+  @keyframes heartFloat{
+    0%{ transform: translateY(0) rotate(0deg); opacity:0; }
+    15%{ opacity:0.6; }
+    85%{ opacity:0.4; }
+    100%{ transform: translateY(-105vh) rotate(25deg); opacity:0; }
+  }
+
+  /* ---------- Pages ---------- */
+  .page{
+    position:fixed;
+    inset:0;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:24px;
+    opacity:0;
+    visibility:hidden;
+    transform: translateY(18px);
+    transition: opacity 0.9s ease, transform 0.9s ease, visibility 0.9s;
+    z-index:2;
+  }
+  .page.active{
+    opacity:1;
+    visibility:visible;
+    transform: translateY(0);
+    position:relative;
+  }
+
+  .card{
+    background: rgba(255,253,250,0.75);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    border: 1px solid rgba(255,255,255,0.6);
+    border-radius: 28px;
+    box-shadow: var(--shadow);
+    padding: 48px 40px;
+    max-width: 560px;
+    width:100%;
+    text-align:center;
+    position:relative;
+  }
+
+  .card h1{
+    font-size: clamp(1.8rem, 5vw, 2.6rem);
+    color: var(--text-dark);
+    margin-bottom:18px;
+    font-weight:600;
+  }
+
+  .card p{
+    font-size: clamp(0.95rem, 2.4vw, 1.08rem);
+    line-height:1.9;
+    color: var(--text-soft);
+    white-space: pre-line;
+    margin-bottom: 30px;
+    min-height: 2em;
+  }
+
+  .greeting{
+    font-family:'Playfair Display', serif;
+    font-style:italic;
+    font-size:1.1rem;
+    color: var(--text-dark);
+  }
+
+  /* ---------- Buttons ---------- */
+  .btn{
+    display:inline-block;
+    background: linear-gradient(135deg, var(--taupe), #a88b64);
+    color: #fff;
+    border:none;
+    padding:14px 38px;
+    font-family:'Poppins', sans-serif;
+    font-size:0.95rem;
+    letter-spacing:0.5px;
+    border-radius: 50px;
+    cursor:pointer;
+    box-shadow: 0 6px 20px rgba(188,163,127,0.45);
+    transition: all 0.35s ease;
+    position:relative;
+    overflow:hidden;
+  }
+  .btn:hover{
+    transform: translateY(-3px);
+    box-shadow: 0 10px 28px rgba(188,163,127,0.6);
+    filter: brightness(1.06);
+  }
+  .btn:active{
+    transform: translateY(0px) scale(0.97);
+  }
+  .btn::after{
+    content:'';
+    position:absolute;
+    top:50%;left:50%;
+    width:0;height:0;
+    background: rgba(255,255,255,0.35);
+    border-radius:50%;
+    transform: translate(-50%,-50%);
+    transition: width 0.5s ease, height 0.5s ease;
+  }
+  .btn:hover::after{
+    width:220px;height:220px;
+  }
+
+  /* ---------- Page Indicator ---------- */
+  .page-indicator{
+    position:fixed;
+    top:22px;
+    left:50%;
+    transform: translateX(-50%);
+    font-size:0.78rem;
+    letter-spacing:2px;
+    color: var(--text-soft);
+    z-index:20;
+    background: rgba(255,253,250,0.6);
+    padding:6px 16px;
+    border-radius:20px;
+    backdrop-filter: blur(6px);
+    opacity:0;
+    transition: opacity 0.6s ease;
+  }
+  .page-indicator.show{ opacity:1; }
+
+  /* ---------- Photo Gallery ---------- */
+  .photo-grid{
+    display:grid;
+    grid-template-columns: repeat(2, 1fr);
+    grid-template-rows: auto auto;
+    gap:14px;
+    margin-bottom:28px;
+  }
+  .photo-slot{
+    position:relative;
+    aspect-ratio: 1/1;
+    border-radius:20px;
+    overflow:hidden;
+    background: linear-gradient(135deg, #f1e8db, #e6d5bd);
+    box-shadow: 0 12px 26px rgba(188,163,127,0.32), 0 2px 6px rgba(140,115,80,0.18);
+    opacity:0;
+    transform: translateY(16px) scale(0.94);
+    transition: opacity 0.9s ease, transform 0.9s ease, box-shadow 0.4s ease;
+    cursor:pointer;
+  }
+  .photo-slot.fade-in{
+    opacity:1;
+    transform: translateY(0) scale(1);
+  }
+  .photo-slot:first-child{
+    grid-column: span 2;
+    aspect-ratio: 16/10;
+  }
+  .photo-slot:hover{
+    box-shadow: 0 18px 34px rgba(188,163,127,0.42), 0 4px 10px rgba(140,115,80,0.22);
+  }
+  .photo-slot img{
+    width:100%;
+    height:100%;
+    object-fit:cover;
+    display:block;
+    transition: transform 0.6s ease, filter 0.6s ease;
+  }
+  .photo-slot:hover img,
+  .photo-slot:active img{
+    transform: scale(1.08);
+    filter: brightness(1.03);
+  }
+  .photo-slot::after{
+    content:'';
+    position:absolute;
+    inset:0;
+    border-radius:20px;
+    border:1px solid rgba(255,255,255,0.5);
+    pointer-events:none;
+  }
+  .photo-caption{
+    position:absolute;
+    bottom:0;left:0;right:0;
+    padding:10px 12px 8px;
+    font-size:0.7rem;
+    letter-spacing:0.5px;
+    color:#fff;
+    text-align:center;
+    background: linear-gradient(to top, rgba(92,77,60,0.55), rgba(92,77,60,0));
+    opacity:0;
+    transition: opacity 0.4s ease;
+  }
+  .photo-slot:hover .photo-caption{
+    opacity:1;
+  }
+
+  /* ---------- Lightbox ---------- */
+  #lightbox{
+    position:fixed;
+    inset:0;
+    background: rgba(60,48,34,0.82);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    z-index:200;
+    opacity:0;
+    visibility:hidden;
+    transition: opacity 0.4s ease, visibility 0.4s ease;
+    padding:24px;
+  }
+  #lightbox.active{
+    opacity:1;
+    visibility:visible;
+  }
+  #lightbox img{
+    max-width:min(90vw, 520px);
+    max-height:80vh;
+    border-radius:18px;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.4);
+    transform: scale(0.9);
+    transition: transform 0.4s ease;
+    object-fit:cover;
+  }
+  #lightbox.active img{
+    transform: scale(1);
+  }
+  #lightbox-close{
+    position:absolute;
+    top:24px;
+    right:24px;
+    width:42px;
+    height:42px;
+    border-radius:50%;
+    background: rgba(255,253,250,0.9);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:1.3rem;
+    color: var(--text-dark);
+    cursor:pointer;
+    box-shadow: 0 6px 16px rgba(0,0,0,0.25);
+    transition: transform 0.3s ease;
+  }
+  #lightbox-close:hover{
+    transform: rotate(90deg) scale(1.05);
+  }
+
+  /* ---------- Final Page Extra ---------- */
+  #page-final .card{
+    max-width:600px;
+  }
+  .final-title{
+    font-size: clamp(2rem, 6vw, 2.9rem);
+    margin-bottom:20px;
+    color: var(--text-dark);
+  }
+  .typing-text{
+    border-right: 2px solid var(--taupe);
+    white-space: pre-wrap;
+    overflow:hidden;
+    display:inline-block;
+    text-align:left;
+  }
+  .bottom-signature{
+    margin-top:24px;
+    font-family:'Playfair Display', serif;
+    font-style:italic;
+    font-size:0.95rem;
+    color: var(--taupe);
+  }
+
+  /* ---------- Confetti ---------- */
+  #confetti-container{
+    position:fixed;
+    inset:0;
+    pointer-events:none;
+    z-index:50;
+    overflow:hidden;
+  }
+  .confetti-piece{
+    position:absolute;
+    top:-20px;
+    border-radius:2px;
+    animation: confettiFall linear forwards;
+  }
+  @keyframes confettiFall{
+    to{
+      transform: translateY(110vh) rotate(560deg);
+      opacity:0.9;
+    }
+  }
+
+  /* ---------- Music Button ---------- */
+  #music-btn{
+    position:fixed;
+    bottom:22px;
+    right:22px;
+    width:56px;
+    height:56px;
+    border-radius:50%;
+    background: linear-gradient(135deg, var(--taupe), #a88b64);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    box-shadow: 0 8px 22px rgba(188,163,127,0.5);
+    cursor:pointer;
+    z-index:100;
+    transition: transform 0.35s ease;
+  }
+  #music-btn:hover{ transform: scale(1.1); }
+  #music-btn svg{ width:24px; height:24px; fill:#fff; }
+  #music-btn.playing{
+    animation: spin 4s linear infinite;
+  }
+  @keyframes spin{
+    from{ transform: rotate(0deg); }
+    to{ transform: rotate(360deg); }
+  }
+
+  @media (max-width: 480px){
+    .card{ padding: 36px 24px; border-radius:22px; }
+    .photo-grid{ gap:10px; }
+    .photo-slot:first-child{ aspect-ratio: 4/3; }
+    #lightbox-close{ top:16px; right:16px; width:38px; height:38px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- Loading Screen -->
+<div id="loading-screen">
+  <div class="loader-heart">🤍</div>
+  <div class="loader-text">Menyiapkan sesuatu untukmu...</div>
+</div>
+
+<!-- Background particles & hearts -->
+<div id="particles"></div>
+<div id="hearts-container"></div>
+
+<!-- Page Indicator -->
+<div class="page-indicator" id="pageIndicator">1 / 8</div>
+
+<!-- PAGE 1 -->
+<section class="page active" id="page-1">
+  <div class="card">
+    <p class="greeting">hey...<br>sebentar ya,<br>aku bikin sesuatu buat kamu.<br>klik kalau udah siap 🤍</p>
+    <button class="btn" onclick="goToPage(2)">Buka</button>
+  </div>
+</section>
+
+<!-- PAGE 2 -->
+<section class="page" id="page-2">
+  <div class="card">
+    <h1>Selamat Ulang Tahun.</h1>
+    <p>Hari ini mungkin cuma tanggal 1 Juli.
+Tapi buat aku,
+hari ini adalah hari seseorang yang paling aku sayang lahir ke dunia.
+Dan aku bersyukur banget karena orang itu adalah kamu.</p>
+    <button class="btn" onclick="goToPage(3)">Lanjut</button>
+  </div>
+</section>
+
+<!-- PAGE 3 -->
+<section class="page" id="page-3">
+  <div class="card">
+    <p>Aku tahu kamu nggak pernah benar-benar ngerayain ulang tahun.
+Jadi aku nggak mau hari ini terasa seperti kewajiban untuk dirayakan.
+Aku cuma pengen hari ini jadi pengingat,
+kalau ada seseorang yang bahagia banget karena kamu hadir di dunia.</p>
+    <button class="btn" onclick="goToPage(4)">Lanjut</button>
+  </div>
+</section>
+
+<!-- PAGE 4 -->
+<section class="page" id="page-4">
+  <div class="card">
+    <p>Terima kasih ya.
+Terima kasih udah bertahan sejauh ini.
+Terima kasih udah melewati semua hal yang mungkin nggak semua orang tahu.
+Aku bangga sama kamu.
+Bangga banget.</p>
+    <button class="btn" onclick="goToPage(5)">Lanjut</button>
+  </div>
+</section>
+
+<!-- PAGE 5 -->
+<section class="page" id="page-5">
+  <div class="card">
+    <p>Semoga di umur yang baru ini,
+langkah kamu selalu dimudahkan.
+semoga badan kamu selalu sehat.
+semoga hati kamu lebih tenang.
+semoga semua mimpi yang lagi kamu perjuangin satu per satu bisa tercapai.
+dan semoga apa pun yang terjadi nanti,
+kamu nggak pernah lupa kalau kamu berharga.</p>
+    <button class="btn" onclick="goToPage(6)">Lanjut</button>
+  </div>
+</section>
+
+<!-- PAGE 6 -->
+<section class="page" id="page-6">
+  <div class="card">
+    <p>Aku juga punya satu harapan.
+Semoga di ulang tahun kamu yang berikutnya,
+dan yang setelahnya lagi,
+aku masih bisa ada di samping kamu.
+Masih bisa jadi orang yang ngucapin selamat ulang tahun paling dulu.
+Dan masih bisa nemenin kamu ngelewatin banyak hari lainnya.</p>
+    <button class="btn" onclick="goToPage(7)">Lanjut</button>
+  </div>
+</section>
+
+<!-- PAGE 7 -->
+<section class="page" id="page-7">
+  <div class="card">
+    <p>Makasih ya
+udah hadir di hidup aku.
+Aku nggak pernah nyangka bakal dipertemukan sama seseorang sebaik kamu.
+Terima kasih udah bikin hari-hari aku terasa lebih berarti.
+Terima kasih karena selalu jadi rumah buat aku.</p>
+
+    <div class="photo-grid" id="photoGrid7">
+      <div class="photo-slot" onclick="openLightbox(this)">
+        <img src="foto1.jpg" alt="Masukkan Foto 1" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22400%22 height=%22300%22><rect width=%22100%25%22 height=%22100%25%22 fill=%22%23eadbc8%22/></svg>'">
+        <div class="photo-caption">Masukkan Foto 1</div>
+      </div>
+      <div class="photo-slot" onclick="openLightbox(this)">
+        <img src="foto2.jpg" alt="Masukkan Foto 2" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22400%22 height=%22400%22><rect width=%22100%25%22 height=%22100%25%22 fill=%22%23e6d5bd%22/></svg>'">
+        <div class="photo-caption">Masukkan Foto 2</div>
+      </div>
+      <div class="photo-slot" onclick="openLightbox(this)">
+        <img src="foto3.jpg" alt="Masukkan Foto 3" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22400%22 height=%22400%22><rect width=%22100%25%22 height=%22100%25%22 fill=%22%23f1e8db%22/></svg>'">
+        <div class="photo-caption">Masukkan Foto 3</div>
+      </div>
+    </div>
+
+    <button class="btn" onclick="goToPage(8)">Lanjut</button>
+  </div>
+</section>
+
+<!-- FINAL PAGE -->
+<section class="page" id="page-final">
+  <div class="card">
+    <h1 class="final-title">Selamat Ulang Tahun, Cintaku 🤍</h1>
+    <p><span class="typing-text" id="typingText"></span></p>
+    <div class="bottom-signature">made with love ♡</div>
+  </div>
+</section>
+
+<!-- Confetti container -->
+<div id="confetti-container"></div>
+
+<!-- Lightbox -->
+<div id="lightbox" onclick="closeLightbox(event)">
+  <div id="lightbox-close" onclick="closeLightbox(event)">&times;</div>
+  <img id="lightbox-img" src="" alt="Foto" onclick="event.stopPropagation()">
+</div>
+
+<!-- Music Button -->
+<div id="music-btn" onclick="toggleMusic()">
+  <svg viewBox="0 0 24 24"><path d="M12 3v10.55A4 4 0 1014 17V7h4V3h-6z"/></svg>
+</div>
+<audio id="bgMusic" loop src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_8c5a7cb6ef.mp3"></audio>
+
+<script>
+/* ---------------- Loading Screen ---------------- */
+window.addEventListener('load', () => {
+  setTimeout(() => {
+    document.getElementById('loading-screen').classList.add('hidden');
+    document.getElementById('pageIndicator').classList.add('show');
+  }, 1400);
+});
+
+/* ---------------- Particle Background ---------------- */
+function createParticles(){
+  const container = document.getElementById('particles');
+  const count = 26;
+  for(let i=0;i<count;i++){
+    const p = document.createElement('div');
+    p.classList.add('particle');
+    const size = Math.random()*8 + 4;
+    p.style.width = size+'px';
+    p.style.height = size+'px';
+    p.style.left = Math.random()*100+'vw';
+    const duration = Math.random()*10 + 10;
+    p.style.animationDuration = duration+'s';
+    p.style.animationDelay = (Math.random()*10)+'s';
+    container.appendChild(p);
+  }
+}
+createParticles();
+
+/* ---------------- Floating Hearts ---------------- */
+function createHearts(){
+  const container = document.getElementById('hearts-container');
+  const symbols = ['🤍','♡','💛'];
+  setInterval(()=>{
+    const h = document.createElement('div');
+    h.classList.add('heart');
+    h.textContent = symbols[Math.floor(Math.random()*symbols.length)];
+    h.style.left = Math.random()*100+'vw';
+    const duration = Math.random()*6 + 8;
+    h.style.animationDuration = duration+'s';
+    const size = Math.random()*1 + 1;
+    h.style.fontSize = size+'rem';
+    container.appendChild(h);
+    setTimeout(()=> h.remove(), duration*1000);
+  }, 900);
+}
+createHearts();
+
+/* ---------------- Page Navigation ---------------- */
+const totalPages = 8; // pages 1-7 + final
+let currentPage = 1;
+
+function goToPage(num){
+  const pages = document.querySelectorAll('.page');
+  pages.forEach(p => p.classList.remove('active'));
+
+  let targetId;
+  if(num > 7){
+    targetId = 'page-final';
+  } else {
+    targetId = 'page-' + num;
+  }
+
+  const target = document.getElementById(targetId);
+  target.classList.add('active');
+  currentPage = num;
+
+  document.getElementById('pageIndicator').textContent = Math.min(num, 8) + ' / 8';
+
+  if(num === 7){
+    setTimeout(()=>{
+      document.querySelectorAll('#photoGrid7 .photo-slot').forEach((slot, idx)=>{
+        setTimeout(()=> slot.classList.add('fade-in'), idx*180);
+      });
+    }, 300);
+  }
+
+  if(num > 7){
+    setTimeout(()=>{
+      startTyping();
+      launchConfetti();
+    }, 400);
+  }
+}
+
+/* ---------------- Typing Effect ---------------- */
+const finalText = `Semoga tahun ini menjadi tahun yang lebih baik dari sebelumnya.
+Aku akan selalu ada untuk merayakan keberadaan kamu,
+meskipun kamu sendiri nggak pernah terbiasa merayakan ulang tahun.
+Karena buat aku,
+kamu selalu layak dirayakan.
+I love you,
+always.`;
+
+let typingStarted = false;
+function startTyping(){
+  if(typingStarted) return;
+  typingStarted = true;
+  const el = document.getElementById('typingText');
+  let i = 0;
+  function type(){
+    if(i <= finalText.length){
+      el.textContent = finalText.slice(0, i);
+      i++;
+      setTimeout(type, 35);
+    } else {
+      el.style.borderRight = 'none';
+    }
+  }
+  type();
+}
+
+/* ---------------- Confetti ---------------- */
+function launchConfetti(){
+  const container = document.getElementById('confetti-container');
+  const colors = ['#BCA37F','#EADBC8','#f4e9d8','#d9c2a3','#fff8f0'];
+  const count = 90;
+  for(let i=0;i<count;i++){
+    setTimeout(()=>{
+      const piece = document.createElement('div');
+      piece.classList.add('confetti-piece');
+      const size = Math.random()*8 + 5;
+      piece.style.width = size+'px';
+      piece.style.height = size*0.4+'px';
+      piece.style.background = colors[Math.floor(Math.random()*colors.length)];
+      piece.style.left = Math.random()*100+'vw';
+      piece.style.animationDuration = (Math.random()*2.5 + 3)+'s';
+      piece.style.opacity = Math.random()*0.6 + 0.4;
+      container.appendChild(piece);
+      setTimeout(()=> piece.remove(), 6000);
+    }, i*25);
+  }
+}
+
+/* ---------------- Lightbox ---------------- */
+function openLightbox(slot){
+  const img = slot.querySelector('img');
+  const lightbox = document.getElementById('lightbox');
+  const lightboxImg = document.getElementById('lightbox-img');
+  lightboxImg.src = img.src;
+  lightboxImg.alt = img.alt;
+  lightbox.classList.add('active');
+  document.body.style.overflow = 'hidden';
+}
+function closeLightbox(e){
+  if(e) e.stopPropagation();
+  const lightbox = document.getElementById('lightbox');
+  lightbox.classList.remove('active');
+  document.body.style.overflow = '';
+}
+
+/* ---------------- Music ---------------- */
+const music = document.getElementById('bgMusic');
+const musicBtn = document.getElementById('music-btn');
+let isPlaying = false;
+
+function toggleMusic(){
+  if(!isPlaying){
+    music.play().catch(()=>{});
+    musicBtn.classList.add('playing');
+    isPlaying = true;
+  } else {
+    music.pause();
+    musicBtn.classList.remove('playing');
+    isPlaying = false;
+  }
+}
+</script>
+
+</body>
+</html>
